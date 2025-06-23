@@ -1,0 +1,83 @@
+local CoreGui = game:GetService("CoreGui")
+local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
+
+-- GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TrollGUI"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- Ảnh Troll Face (luôn hiển thị)
+local imageLabel = Instance.new("ImageLabel")
+imageLabel.Size = UDim2.new(1, 0, 1, 0)
+imageLabel.Position = UDim2.new(0, 0, 0, 0)
+imageLabel.BackgroundTransparency = 1
+imageLabel.Image = "rbxassetid://12532598004"
+imageLabel.ZIndex = 10
+imageLabel.Parent = screenGui
+
+-- Chữ troll
+local msg = Instance.new("TextLabel")
+msg.Size = UDim2.new(0.6, 0, 0.15, 0)
+msg.Position = UDim2.new(0.2, 0, 0.4, 0)
+msg.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+msg.TextColor3 = Color3.fromRGB(255, 255, 0)
+msg.TextScaled = true
+msg.Text = "😎 BỊ TROLL RỒI NHA!"
+msg.Font = Enum.Font.FredokaOne
+msg.TextStrokeTransparency = 0.4
+msg.BackgroundTransparency = 0.2
+msg.ZIndex = 20
+msg.Visible = false
+msg.Parent = screenGui
+
+-- Camera rung
+local function shakeCamera(duration)
+	local baseCFrame = Camera.CFrame
+	local endTime = tick() + duration
+	while tick() < endTime do
+		local offset = Vector3.new(math.random(-2,2)/10, math.random(-2,2)/10, 0)
+		Camera.CFrame = baseCFrame * CFrame.new(offset)
+		task.wait(0.03)
+	end
+	Camera.CFrame = baseCFrame
+end
+
+-- Chữ đổi màu và nhấp nháy liên tục
+task.spawn(function()
+	while true do
+		if msg.Visible then
+			msg.TextColor3 = Color3.fromRGB(math.random(100,255), math.random(100,255), math.random(100,255))
+			msg.Visible = false
+			task.wait(0.1)
+			msg.Visible = true
+		end
+		task.wait(0.2)
+	end
+end)
+
+-- Lặp vô hạn: phát âm thanh, rung, hiện chữ troll
+while true do
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://7816195044"
+	sound.Volume = 5
+	sound.Looped = false
+	sound.Parent = SoundService
+	sound:Play()
+
+	task.delay(0.5, function()
+		msg.Visible = true
+	end)
+
+	task.spawn(function()
+		shakeCamera(sound.TimeLength)
+	end)
+
+	sound.Ended:Wait()
+	sound:Destroy()
+	msg.Visible = false
+	task.wait(1)
+end
