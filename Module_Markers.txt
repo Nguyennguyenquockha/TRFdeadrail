@@ -1,0 +1,30 @@
+-- MarkerModule.lua
+local MarkerModule = {}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Kiểm tra nếu Marker đã lấy (bạn cần điều chỉnh nếu hệ thống khác)
+function MarkerModule:IsCollected(markerName)
+	local badges = LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("BadgeGui")
+	if badges and badges:FindFirstChild(markerName) then
+		return true
+	end
+	return false
+end
+
+-- Trả về danh sách các Marker hợp lệ để lấy (có Touch hoặc Click)
+function MarkerModule:GetAllCollectableMarkers()
+	local valid = {}
+	for _, model in pairs(workspace:GetDescendants()) do
+		if model:IsA("Model") and not self:IsCollected(model.Name) then
+			local part = model:FindFirstChildWhichIsA("BasePart")
+			if part and (model:FindFirstChildOfClass("ClickDetector") or model:FindFirstChildOfClass("TouchTransmitter")) then
+				table.insert(valid, {Model = model, Position = part.Position, Name = model.Name})
+			end
+		end
+	end
+	return valid
+end
+
+return MarkerModule
